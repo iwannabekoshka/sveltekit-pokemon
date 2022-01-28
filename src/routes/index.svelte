@@ -24,8 +24,8 @@
 	import PokeCard from '../components/PokeCard.svelte'
 	import Peepos from '../components/Peepos.svelte'
 	import InputSearch from '../components/InputSearch.svelte'
-	import { fade } from 'svelte/transition'
-
+	import * as animateScroll from "svelte-scrollto"
+	import { sineOut } from 'svelte/easing'
 
 	import { pokemonsStore } from '../stores/pokemonsStore.js'
 
@@ -33,46 +33,61 @@
 
 	let filteredPokemons
 
+	let y
+	let buttonLoadMorePokemons
+
 	let limit
-	let page
 	let searchTerm
 	pokemonsStore.subscribe(store => {
 		limit = store.limit
-		page = store.page
 		searchTerm = store.search
 	})
-
-	function changePageHandler() {
-		pokemonsStore.update(store => {
-			return {
-				...store,
-				page
-			}
-		})
-	}
 
 	function changeInputHandler() {
 		pokemonsStore.update(store => {
 			return {
 				...store,
-				page: 1,
-				search: searchTerm
+				search: searchTerm,
+				limit: 12
 			}
 		})
 	}
 
-	$: {
-		let offset = limit * (page - 1)
+	function onLoadMorePokemons() {
+		const scrollPosition = offset(buttonLoadMorePokemons).top
 
+		pokemonsStore.update(store => {
+			return {
+				...store,
+				limit: limit + 12
+			}
+		})
+
+		setTimeout(() => {
+			animateScroll.scrollTo({y: scrollPosition, duration: 600, easing: sineOut})
+		}, 200)
+
+	}
+
+	function offset(el) {
+		let rect = el.getBoundingClientRect(),
+			scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+			scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+		return { top: rect.top + scrollTop, left: rect.left + scrollLeft }
+	}
+
+	$: {
 		if (searchTerm) {
 			filteredPokemons = [...pokemons].filter(pokemon => pokemon.name
 				.includes(searchTerm.toLowerCase()))
-				.slice(offset, offset + limit)
+				.slice(0, limit)
 		} else {
-			filteredPokemons = [...pokemons].slice(offset, offset + limit)
+			filteredPokemons = [...pokemons].slice(0, limit)
 		}
 	}
 </script>
+
+<svelte:window bind:scrollY={y}/>
 
 <svelte:head>
 	<title>Pokedex</title>
@@ -89,25 +104,22 @@
 	placeholder='Search Pokemon'
 />
 
-<h3>Page</h3>
-<input
-	class='rounded-md text--lg p-4 border-2 border-gray-200'
-	type='number'
-	bind:value={page}
-	on:change={changePageHandler}
-	min='1'
+<div
+	class='py-4 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4'
 >
+	{#each filteredPokemons as pokemon (pokemon.id)}
+		<PokeCard pokemon={pokemon} />
+	{/each}
+</div>
 
-{#key filteredPokemons}
-	<div
-		class='py-4 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4'
-		in:fade={{delay: 500, duration: 500}}
-		out:fade={{duration: 500}}
+<div class='flex justify-center'>
+	<button
+		class='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+		on:click={onLoadMorePokemons}
+		bind:this={buttonLoadMorePokemons}
 	>
-		{#each filteredPokemons as pokemon (pokemon.id)}
-			<PokeCard pokemon={pokemon} />
-		{/each}
-	</div>
-{/key}
+		Load more
+	</button>
+</div>
 
 
