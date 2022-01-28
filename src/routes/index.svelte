@@ -49,7 +49,7 @@
 
 <InputSearch bind:value={searchTerm} placeholder='Search Pokemon'/>
 
-<div class='py-4 grid gap-4 md:grid-cols-2 grid-cols-1'>
+<div class='py-4 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4'>
 	{#each filteredPokemons as pokemon (pokemon.id)}
 		<PokeCard pokemon={pokemon} />
 	{/each}
