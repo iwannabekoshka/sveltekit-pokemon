@@ -1,6 +1,16 @@
 <script>
+	import { createEventDispatcher } from 'svelte'
+
+	const dispatch = createEventDispatcher()
+
 	export let value
 	export let placeholder
+
+	function inputChangeHandler() {
+		dispatch(
+			'onInputChange'
+		)
+	}
 </script>
 
 <input
@@ -8,4 +18,5 @@
 	type='text'
 	placeholder={placeholder}
 	bind:value={value}
+	on:input={inputChangeHandler}
 >
