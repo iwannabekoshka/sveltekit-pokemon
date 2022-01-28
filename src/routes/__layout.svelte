@@ -9,6 +9,7 @@
 <script>
 	import Nav from '../components/Nav.svelte'
 	import PageTransition from '../components/PageTransition.svelte'
+	import ToPageTop from '../components/ToPageTop.svelte'
 
 	export let key
 </script>
@@ -18,6 +19,7 @@
 		<Nav />
 		<slot></slot>
 	</div>
+	<ToPageTop />
 </PageTransition>
 
 <style>
