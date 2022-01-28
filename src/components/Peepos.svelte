@@ -24,3 +24,10 @@
 		<img src='/static/peepoHop.gif' alt='Peepo Hop'>
 	{/each}
 </div>
+
+<style>
+	img {
+			max-width: 100px;
+      width: 100%;
+	}
+</style>
