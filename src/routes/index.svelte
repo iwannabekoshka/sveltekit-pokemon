@@ -22,6 +22,8 @@
 <script>
 	import PageTitle from '../components/PageTitle.svelte';
 	import PokeCard from '../components/PokeCard.svelte';
+	import Peepos from '../components/Peepos.svelte'
+	import InputSearch from '../components/InputSearch.svelte'
 
 	export let pokemons
 
@@ -43,12 +45,9 @@
 
 <PageTitle title='Svelte Kit Pokedex' />
 
-<input
-	class='w-full rounded-md text--lg p-4 border-2 border-gray-200'
-	type='text'
-	placeholder='Search Pokemon'
-	bind:value={searchTerm}
->
+<Peepos />
+
+<InputSearch bind:value={searchTerm} placeholder='Search Pokemon'/>
 
 <div class='py-4 grid gap-4 md:grid-cols-2 grid-cols-1'>
 	{#each filteredPokemons as pokemon (pokemon.id)}
