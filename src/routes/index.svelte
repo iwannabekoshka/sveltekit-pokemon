@@ -1,6 +1,6 @@
 <script context='module'>
 	export async function load({ params }) {
-		const url = `https://pokeapi.co/api/v2/pokemon/?limit=100`
+		const url = `https://pokeapi.co/api/v2/pokemon/?limit=1000`
 		const res = await fetch(url)
 		const data = await res.json()
 		const loadedPokemons = data.results.map((pokemon, index) => {
@@ -30,11 +30,18 @@
 	let searchTerm = ''
 	let filteredPokemons
 
+	let limit = 12
+	let pokemonsPage = 1
+
 	$: {
+		let offset = limit*(pokemonsPage - 1)
+
 		if (searchTerm) {
-			filteredPokemons = [...pokemons].filter(pokemon => pokemon.name.includes(searchTerm.toLowerCase()))
+			filteredPokemons = [...pokemons].filter(pokemon => pokemon.name
+				.includes(searchTerm.toLowerCase()))
+				.slice(offset, offset + limit)
 		} else {
-			filteredPokemons = [...pokemons]
+			filteredPokemons = [...pokemons].slice(offset, offset + limit)
 		}
 	}
 </script>
@@ -47,7 +54,17 @@
 
 <Peepos />
 
+<h3>Filter</h3>
 <InputSearch bind:value={searchTerm} placeholder='Search Pokemon'/>
+
+<h3>Page</h3>
+<input
+	class='rounded-md text--lg p-4 border-2 border-gray-200'
+	type='number'
+	bind:value={pokemonsPage}
+	min='1'
+
+>
 
 <div class='py-4 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4'>
 	{#each filteredPokemons as pokemon (pokemon.id)}
